@@ -21,7 +21,7 @@ OA Coder is an Electron application that captures screenshots and leverages the 
 1. **Clone the repository:**
 
    ```
-   git clone https://github.com/yourusername/oa-coder.git
+   git clone https://github.com/archangel0x01/oa-coder.git
    cd oa-coder
    ```
 2. **Install the dependencies:**
