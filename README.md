@@ -51,6 +51,7 @@ OA Coder is an Electron application that captures screenshots and leverages the 
     - Ctrl+Shift+S: Capture a screenshot and process it immediately. In multi-page mode, this shortcut finalizes the session and sends all captured screenshots for processing.
     - Ctrl+Shift+A: Capture an additional screenshot in multi-page mode. The instruction banner will remind you of the mode and available shortcuts.
     - Ctrl+Shift+R: Reset the current process, clearing all captured screenshots and any displayed results.
+    - Ctrl+Shift+Q: Close the running process, clearing all captured screenshot.
 
 
 ## Status
