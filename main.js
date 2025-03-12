@@ -154,6 +154,13 @@ function createWindow() {
   globalShortcut.register('CommandOrControl+Shift+R', () => {
     resetProcess();
   });
+     
+  // Ctrl+Shift+Q => Quit the application
+globalShortcut.register('CommandOrControl+Shift+Q', () => {
+  console.log("Quitting application...");
+  app.quit();
+  
+});
 }
 
 app.whenReady().then(createWindow);
