@@ -1,9 +1,17 @@
-const { app, BrowserWindow, globalShortcut } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  systemPreferences,
+  ipcMain,
+} = require("electron");
 const path = require("path");
 const screenshot = require("screenshot-desktop");
 const fs = require("fs");
 const { OpenAI } = require("openai");
-const mic = require("mic");
+const tmp = require("tmp");
+systemPreferences.askForMediaAccess("microphone");
+systemPreferences.askForMediaAccess("camera");
 
 let config;
 try {
@@ -107,7 +115,21 @@ function resetProcess() {
   screenshots = [];
   multiPageMode = false;
   mainWindow.webContents.send("clear-result");
-  updateInstruction("Ctrl+Shift+S: Screenshot | Ctrl+Shift+A: Multi-mode");
+  updateInstructionBanner();
+}
+
+function updateInstructionBanner() {
+  const instructions = [
+    "Ctrl+Shift+S: Screenshot",
+    "Ctrl+Shift+A: Multi-mode",
+    "Ctrl+Shift+F: Record Audio",
+    "Ctrl+Shift+C: Show Chat",
+    "Ctrl+B: Toggle Hide",
+    "Ctrl+Arrow: Control view",
+    "Ctrl+Shift+Q: Close",
+  ];
+
+  updateInstruction(instructions.join("\n"));
 }
 
 function toggleWindowVisibility() {
@@ -140,87 +162,99 @@ function moveWindow(direction) {
   }
 }
 
+// Audio recording state
 let isRecording = false;
-let audioChunks = [];
-let micInstance;
-const AUDIO_FILE_PATH = path.join(__dirname, "recorded_audio.wav");
 
+// Start the audio recording process
 function startRecording() {
   if (isRecording) return;
+
+  updateInstruction("Starting audio recording...");
+  mainWindow.webContents.send("start-audio-recording");
   isRecording = true;
-  audioChunks = [];
-
-  micInstance = mic({
-    rate: "16000",
-    channels: "1",
-    fileType: "wav",
-  });
-
-  const micInputStream = micInstance.getAudioStream();
-  const outputFileStream = fs.createWriteStream(AUDIO_FILE_PATH);
-
-  micInputStream.pipe(outputFileStream);
-
-  micInputStream.on("error", (err) => {
-    console.error("Mic error:", err);
-  });
-
-  micInstance.start();
-  console.log("Recording started...");
 }
 
-async function stopRecording() {
-  if (!isRecording || !micInstance) return;
-  isRecording = false;
-
-  micInstance.stop();
-  console.log("Recording stopped.");
-
-  // Ensure the file exists before sending to OpenAI
-  if (!fs.existsSync(AUDIO_FILE_PATH)) {
-    console.error("Error: Audio file not found!");
-    return;
-  }
-
+// Process the recorded audio
+async function processAudio(audioBuffer) {
   try {
+    // Create a temporary file for the audio data
+    const tmpFile = tmp.fileSync({ postfix: ".webm" });
+    fs.writeFileSync(tmpFile.name, Buffer.from(audioBuffer));
+
+    updateInstruction("Processing audio...");
+
+    // Send audio to OpenAI for transcription
     const response = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(AUDIO_FILE_PATH),
+      file: fs.createReadStream(tmpFile.name),
       model: "whisper-1",
       response_format: "text",
     });
 
-    const transcribedText = response;
+    const transcribedText = response || "";
     console.log("Transcribed Text:", transcribedText);
 
-    mainWindow.webContents.send("transcription-result", transcribedText);
+    if (!transcribedText.trim()) {
+      throw new Error("Transcription failed: Received empty text.");
+    }
 
-    // Send transcribed text for further processing
+    // Send the transcribed text to the renderer to display in the chat
+    mainWindow.webContents.send("add-chat-message", {
+      role: "user",
+      content: transcribedText,
+    });
+
+    // Process transcribed text further
     const chatResponse = await openai.chat.completions.create({
       model: config.model,
       messages: [{ role: "user", content: transcribedText }],
       max_tokens: 5000,
     });
 
-    mainWindow.webContents.send(
-      "analysis-result",
-      chatResponse.choices[0].message.content
-    );
+    const responseContent = chatResponse.choices[0].message.content;
+
+    // Send the AI response to the renderer to display in the chat
+    mainWindow.webContents.send("add-chat-message", {
+      role: "assistant",
+      content: responseContent,
+    });
+
+    // Also send to the analysis-result for the overlay display
+    mainWindow.webContents.send("analysis-result", responseContent);
+
+    // Cleanup temp file
+    try {
+      fs.unlinkSync(tmpFile.name);
+      console.log("Temporary file deleted.");
+    } catch (cleanupError) {
+      console.error("Error deleting temp file:", cleanupError);
+    }
+
+    // Update instruction banner back to normal
+    updateInstructionBanner();
   } catch (err) {
     console.error("Error processing audio:", err);
     mainWindow.webContents.send("error", err.message);
-  } finally {
-    // Clean up the recorded file
-    fs.unlinkSync(AUDIO_FILE_PATH);
+    updateInstructionBanner();
   }
+}
+
+// Stop the audio recording process
+function stopRecording() {
+  if (!isRecording) return;
+
+  updateInstruction("Stopping audio recording...");
+  mainWindow.webContents.send("stop-audio-recording");
+  isRecording = false;
 }
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      enableRemoteModule: true,
     },
     frame: false,
     transparent: true,
@@ -292,7 +326,8 @@ function createWindow() {
   globalShortcut.register("CommandOrControl+Shift+Right", () =>
     moveWindow("right")
   );
-  // Bind Ctrl+Shift+R to Start/Stop Recording
+
+  // Bind Ctrl+Shift+F to Start/Stop Recording
   globalShortcut.register("CommandOrControl+Shift+F", () => {
     if (isRecording) {
       stopRecording();
@@ -300,6 +335,19 @@ function createWindow() {
       startRecording();
     }
   });
+
+  // Toggle chat visibility
+  globalShortcut.register("CommandOrControl+Shift+C", () => {
+    mainWindow.webContents.send("toggle-chat-visibility");
+  });
+
+  // IPC handlers for audio recording
+  ipcMain.on("audio-data", (event, audioBuffer) => {
+    processAudio(audioBuffer);
+  });
+
+  // Initialize the instruction banner
+  updateInstructionBanner();
 }
 
 app.whenReady().then(createWindow);

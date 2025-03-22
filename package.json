@@ -1,15 +1,35 @@
 {
   "name": "oa-coder",
+  "productName": "Trayson Test",
+  "author": "Trayson Kelii",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "package": "npx electron-builder --dir"
   },
   "dependencies": {
-    "electron": "^28.1.0",
     "mic": "^2.1.2",
-    "node-record-lpcm16": "^1.0.1",
     "openai": "^4.24.1",
-    "screenshot-desktop": "^1.15.0"
+    "screenshot-desktop": "^1.15.0",
+    "tmp": "^0.2.3"
+  },
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.KeliiConsulting.StealthTapAI",
+    "extends": null,
+    "mac": {
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Please give us access to your microphone",
+        "NSCameraUsageDescription": "Please give us access to your camera",
+        "com.apple.security.device.audio-input": true,
+        "com.apple.security.device.camera": true
+      },
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    }
   }
 }

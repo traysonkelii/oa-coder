@@ -1,2 +1,5 @@
 node_modules/
 package-lock.json
+dist
+local.config.json
+.DS_Store
