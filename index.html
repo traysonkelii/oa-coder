@@ -22,52 +22,79 @@
       position: relative;
     }
 
-    /* Improved instruction banner */
-    #instruction-banner {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.45);
-      color: #fff;
-      padding: 8px 15px;
-      font-size: 14px;
-      border-radius: 0 0 8px 8px;
-      z-index: 9999;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      transition: opacity 0.3s ease;
-      user-select: none;
-    }
-
-    #response-overlay {
+    /* Command sidebar */
+    #command-sidebar {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s;
-      z-index: 9998;
-      backdrop-filter: blur(3px);
+      width: 180px;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      padding: 15px;
+      box-sizing: border-box;
+      z-index: 9999;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
     }
 
-    #response-overlay.visible {
-      opacity: .7;
-      visibility: visible;
+    #sidebar-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      margin: 0 0 15px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #instruction-banner {
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-line;
+      user-select: none;
+      flex: 1;
+    }
+
+    .shortcut-item {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    .shortcut-key {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin-right: 8px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    .shortcut-desc {
+      flex: 1;
+    }
+
+    /* Split view container - adjusted to account for sidebar */
+    #app-container {
+      display: flex;
+      width: calc(100% - 180px);
+      height: 100vh;
+      margin-left: 180px;
+    }
+
+    /* Left side - Current task */
+    #task-container {
+      flex: 1;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
     }
 
     #response-box {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 900px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: rgba(25, 25, 25, 0.95);
+      width: 100%;
+      max-height: 100%;
+      background: rgba(25, 25, 25, 0.55);
       color: #fff;
       padding: 25px;
       box-sizing: border-box;
@@ -75,6 +102,7 @@
       line-height: 1.5;
       border-radius: 8px;
       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
     }
 
     #response-box::-webkit-scrollbar {
@@ -91,6 +119,99 @@
       border-radius: 4px;
     }
 
+    /* Right side - Chat history */
+    #chat-container {
+      width: 350px;
+      height: 100%;
+      background: rgba(30, 30, 30, 0.85);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.3s ease, width 0.3s ease;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #chat-container.hidden {
+      transform: translateX(350px);
+    }
+
+    #chat-header {
+      padding: 10px 15px;
+      background: rgba(50, 50, 50, 0.5);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #chat-header h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #fff;
+      font-weight: normal;
+    }
+
+    #chat-toggle-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-messages::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    .chat-message {
+      max-width: 90%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      line-height: 1.4;
+      font-size: 13px;
+      position: relative;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      background: rgba(45, 90, 160, 0.7);
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-message.assistant {
+      align-self: flex-start;
+      background: rgba(70, 70, 70, 0.7);
+      border-bottom-left-radius: 2px;
+    }
+
+    .message-time {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* Code and pre styling */
     pre {
       background: rgba(40, 40, 40, 0.66);
       color: #f0f0f0;
@@ -126,14 +247,55 @@
       border-left: 4px solid #ff4444;
       margin: 10px 0;
     }
+
+    /* Legacy response overlay - keeping this for compatibility */
+    #response-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s;
+      z-index: 9998;
+      backdrop-filter: blur(3px);
+    }
+
+    #response-overlay.visible {
+      opacity: .7;
+      visibility: visible;
+    }
   </style>
 </head>
 
 <body>
-  <div id="instruction-banner"></div>
-  <div id="response-overlay">
-    <div id="response-box"></div>
+  <!-- Command sidebar with instructions -->
+  <div id="command-sidebar">
+    <h3 id="sidebar-title">Commands</h3>
+    <div id="instruction-banner"></div>
   </div>
+
+  <!-- New split view layout -->
+  <div id="app-container">
+    <!-- Left side - Current task -->
+    <div id="task-container">
+      <div id="response-box"></div>
+    </div>
+
+    <!-- Right side - Chat history -->
+    <div id="chat-container">
+      <div id="chat-header">
+        <h3>Conversation History</h3>
+        <button id="chat-toggle-btn">◀</button>
+      </div>
+      <div id="chat-messages"></div>
+    </div>
+  </div>
+
+  <!-- Legacy overlay (for compatibility) -->
+  <div id="response-overlay"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script>
@@ -145,32 +307,100 @@
       gfm: true
     });
 
+    // Get DOM elements
+    const instructionBanner = document.getElementById('instruction-banner');
+    const responseBox = document.getElementById('response-box');
+    const chatContainer = document.getElementById('chat-container');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatToggleBtn = document.getElementById('chat-toggle-btn');
+    const legacyOverlay = document.getElementById('response-overlay');
+
+    // Legacy functions (keeping for compatibility)
     const showOverlay = () => {
-      const overlay = document.getElementById('response-overlay');
-      overlay.classList.add('visible');
+      // Instead of showing overlay, we'll just update the response box
+      responseBox.style.display = 'block';
     };
 
     const hideOverlay = () => {
-      const overlay = document.getElementById('response-overlay');
-      overlay.classList.remove('visible');
+      // Instead of hiding overlay, we'll clear the response box
+      responseBox.style.display = 'block';
     };
 
     const updateBanner = (text, show = true) => {
-      const banner = document.getElementById('instruction-banner');
-      banner.style.opacity = show ? '1' : '0';
-      if (text) banner.textContent = text;
+      // Parse the text and create formatted shortcut items
+      if (text) {
+        const lines = text.split('\n');
+        let formattedHtml = '';
+
+        lines.forEach(line => {
+          if (line.includes(':')) {
+            const [shortcut, description] = line.split(':');
+            formattedHtml += `
+              <div class="shortcut-item">
+                <span class="shortcut-key">${shortcut.trim()}</span>
+                <span class="shortcut-desc">${description.trim()}</span>
+              </div>
+            `;
+          } else if (line.trim()) {
+            formattedHtml += `<div class="shortcut-item">${line}</div>`;
+          }
+        });
+
+        instructionBanner.innerHTML = formattedHtml;
+      } else {
+        instructionBanner.innerHTML = '';
+      }
+
+      const commandSidebar = document.getElementById('command-sidebar');
+      commandSidebar.style.opacity = show ? '1' : '0';
     };
+
+    // Chat visibility toggle
+    chatToggleBtn.addEventListener('click', () => {
+      toggleChatVisibility();
+    });
+
+    function toggleChatVisibility() {
+      chatContainer.classList.toggle('hidden');
+      chatToggleBtn.textContent = chatContainer.classList.contains('hidden') ? '▶' : '◀';
+    }
+
+    function formatTimeStamp() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function addChatMessage(role, content) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `chat-message ${role}`;
+
+      // For assistant messages, apply markdown parsing
+      if (role === 'assistant') {
+        messageDiv.innerHTML = marked.parse(content);
+      } else {
+        messageDiv.textContent = content;
+      }
+
+      const timeSpan = document.createElement('div');
+      timeSpan.className = 'message-time';
+      timeSpan.textContent = formatTimeStamp();
+      messageDiv.appendChild(timeSpan);
+
+      chatMessages.appendChild(messageDiv);
+
+      // Scroll to the bottom of the chat
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
     const handlers = {
       'analysis-result': (event, result) => {
-        showOverlay();
-        document.getElementById('response-box').innerHTML = marked.parse(result);
+        // Update the response box instead of showing overlay
+        responseBox.innerHTML = marked.parse(result);
         updateBanner("Ctrl+Shift+R: Repeat process");
       },
 
       'error': (event, error) => {
-        showOverlay();
-        document.getElementById('response-box').innerHTML =
+        responseBox.innerHTML =
           `<div class="error-message">
             <strong>Error:</strong> ${error}
             <br><small>Press Ctrl+Shift+R to try again</small>
@@ -186,8 +416,21 @@
       },
 
       'clear-result': () => {
-        document.getElementById('response-box').innerHTML = "";
-        hideOverlay();
+        responseBox.innerHTML = "";
+      },
+
+      'add-chat-message': (event, message) => {
+        addChatMessage(message.role, message.content);
+
+        // Make sure chat is visible when a new message comes in
+        if (chatContainer.classList.contains('hidden')) {
+          chatContainer.classList.remove('hidden');
+          chatToggleBtn.textContent = '◀';
+        }
+      },
+
+      'toggle-chat-visibility': () => {
+        toggleChatVisibility();
       }
     };
 
@@ -195,13 +438,65 @@
       ipcRenderer.on(channel, handler);
     });
 
+    // Audio recording functionality
+    let mediaRecorder;
+    let audioChunks = [];
+
+    // Start audio recording
+    ipcRenderer.on('start-audio-recording', async () => {
+      try {
+        audioChunks = [];
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 1,
+            sampleRate: 16000
+          },
+          video: false
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+          // Convert Blob to ArrayBuffer
+          const arrayBuffer = await audioBlob.arrayBuffer();
+
+          // Send the audio data to the main process
+          ipcRenderer.send('audio-data', Buffer.from(arrayBuffer));
+
+          // Stop all tracks in the stream
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        updateBanner("Recording audio... Press Ctrl+Shift+F to stop");
+      } catch (error) {
+        console.error("Error starting recording:", error);
+        updateBanner("Error starting recording: " + error.message);
+      }
+    });
+
+    // Stop audio recording
+    ipcRenderer.on('stop-audio-recording', () => {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        updateBanner("Processing audio...");
+      }
+    });
+
     window.addEventListener('unload', () => {
       Object.keys(handlers).forEach(channel => {
         ipcRenderer.removeAllListeners(channel);
       });
     });
-
-    updateBanner("Ctrl+Shift+S: Screenshot  |  Ctrl+Shift+A: Multi-mode  |  Ctrl+B: Toggle Hide  |  Ctrl+Arrow: Control view  |  Ctrl+Shift+Q: Close");
   </script>
 </body>
 
