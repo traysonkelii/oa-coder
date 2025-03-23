@@ -64,4 +64,5 @@ This program is still under development. Some features may not be fully implemen
 
 - New voice record for LLM assistance
 - Chat history
-- better CSS experience
+- Better CSS experience
+- Better prompt
