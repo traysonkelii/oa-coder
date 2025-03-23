@@ -22,21 +22,38 @@
       position: relative;
     }
 
-    /* Command sidebar */
-    #command-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 180px;
+    /* Main layout container */
+    #app-container {
+      display: flex;
+      width: 100%;
       height: 100vh;
+      opacity: 1;
+      /* This will be controlled by the unified slider */
+    }
+
+    /* Left column - Commands and Chat (1/3 width) */
+    #left-column {
+      width: 33%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: rgba(30, 30, 30, 0.85);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* Command sidebar - Top part of left column */
+    #command-sidebar {
+      flex: 0 0 auto;
       background: rgba(0, 0, 0, 0.45);
       color: #fff;
       padding: 15px;
       box-sizing: border-box;
-      z-index: 9999;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
       display: flex;
       flex-direction: column;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
     }
 
     #sidebar-title {
@@ -45,6 +62,9 @@
       margin: 0 0 15px 0;
       padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     #instruction-banner {
@@ -74,65 +94,13 @@
       flex: 1;
     }
 
-    /* Split view container - adjusted to account for sidebar */
-    #app-container {
-      display: flex;
-      width: calc(100% - 180px);
-      height: 100vh;
-      margin-left: 180px;
-    }
-
-    /* Left side - Current task */
-    #task-container {
-      flex: 1;
-      height: 100%;
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-
-    #response-box {
-      width: 100%;
-      max-height: 100%;
-      background: rgba(25, 25, 25, 0.55);
-      color: #fff;
-      padding: 25px;
-      box-sizing: border-box;
-      font-size: 15px;
-      line-height: 1.5;
-      border-radius: 8px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-      overflow-y: auto;
-    }
-
-    #response-box::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #response-box::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
-    }
-
-    #response-box::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 4px;
-    }
-
-    /* Right side - Chat history */
+    /* Chat Container - Bottom part of left column */
     #chat-container {
-      width: 350px;
-      height: 100%;
-      background: rgba(30, 30, 30, 0.85);
+      flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: transform 0.3s ease, width 0.3s ease;
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    #chat-container.hidden {
-      transform: translateX(350px);
+      position: relative;
     }
 
     #chat-header {
@@ -149,14 +117,6 @@
       font-size: 14px;
       color: #fff;
       font-weight: normal;
-    }
-
-    #chat-toggle-btn {
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.7);
-      cursor: pointer;
-      font-size: 18px;
     }
 
     #chat-messages {
@@ -209,6 +169,76 @@
       color: rgba(255, 255, 255, 0.6);
       margin-top: 4px;
       text-align: right;
+    }
+
+    /* Right content area (2/3 width) */
+    #task-container {
+      width: 67%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    #response-box {
+      width: 100%;
+      max-height: 100%;
+      background: rgba(25, 25, 25, 0.55);
+      color: #fff;
+      padding: 25px;
+      box-sizing: border-box;
+      font-size: 15px;
+      line-height: 1.5;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+    }
+
+    #response-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #response-box::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+
+    #response-box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+    }
+
+    /* Resizer between command and chat sections */
+    #command-resizer {
+      height: 5px;
+      width: 100%;
+      background: rgba(100, 100, 100, 0.4);
+      cursor: ns-resize;
+      position: relative;
+    }
+
+    #command-resizer:hover {
+      background: rgba(100, 100, 100, 0.7);
+    }
+
+    /* Unified opacity slider container */
+    .opacity-slider-container {
+      display: flex;
+      align-items: center;
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+
+    .opacity-slider {
+      width: 80px;
+      height: 5px;
+      margin-left: 5px;
     }
 
     /* Code and pre styling */
@@ -267,31 +297,63 @@
       opacity: .7;
       visibility: visible;
     }
+
+    /* Column resizer */
+    #column-resizer {
+      width: 5px;
+      height: 100%;
+      background: rgba(100, 100, 100, 0.4);
+      cursor: ew-resize;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 100;
+    }
+
+    #column-resizer:hover {
+      background: rgba(100, 100, 100, 0.7);
+    }
   </style>
 </head>
 
 <body>
-  <!-- Command sidebar with instructions -->
-  <div id="command-sidebar">
-    <h3 id="sidebar-title">Commands</h3>
-    <div id="instruction-banner"></div>
-  </div>
-
-  <!-- New split view layout -->
+  <!-- New split view layout - two columns -->
   <div id="app-container">
-    <!-- Left side - Current task -->
+    <!-- Left column (1/3) - Commands and Chat -->
+    <div id="left-column">
+      <!-- Command sidebar at top -->
+      <div id="command-sidebar">
+        <div id="sidebar-title">
+          Commands
+        </div>
+        <div id="instruction-banner"></div>
+      </div>
+
+      <!-- Resizer between command and chat -->
+      <div id="command-resizer"></div>
+
+      <!-- Chat container at bottom -->
+      <div id="chat-container">
+        <div id="chat-header">
+          <h3>Conversation History</h3>
+        </div>
+        <div id="chat-messages"></div>
+      </div>
+
+      <!-- Column resizer -->
+      <div id="column-resizer"></div>
+    </div>
+
+    <!-- Right content area (2/3) -->
     <div id="task-container">
       <div id="response-box"></div>
     </div>
+  </div>
 
-    <!-- Right side - Chat history -->
-    <div id="chat-container">
-      <div id="chat-header">
-        <h3>Conversation History</h3>
-        <button id="chat-toggle-btn">◀</button>
-      </div>
-      <div id="chat-messages"></div>
-    </div>
+  <!-- Unified opacity slider -->
+  <div class="opacity-slider-container">
+    <small style="color: white;">Window Opacity:</small>
+    <input type="range" class="opacity-slider" id="unified-opacity-slider" min="0.1" max="1" step="0.05" value="1">
   </div>
 
   <!-- Legacy overlay (for compatibility) -->
@@ -312,8 +374,73 @@
     const responseBox = document.getElementById('response-box');
     const chatContainer = document.getElementById('chat-container');
     const chatMessages = document.getElementById('chat-messages');
-    const chatToggleBtn = document.getElementById('chat-toggle-btn');
+    const commandSidebar = document.getElementById('command-sidebar');
+    const leftColumn = document.getElementById('left-column');
+    const taskContainer = document.getElementById('task-container');
     const legacyOverlay = document.getElementById('response-overlay');
+    const appContainer = document.getElementById('app-container');
+
+    // Get unified opacity slider
+    const unifiedOpacitySlider = document.getElementById('unified-opacity-slider');
+
+    // Get resizers
+    const columnResizer = document.getElementById('column-resizer');
+    const commandResizer = document.getElementById('command-resizer');
+
+    // Unified opacity control
+    unifiedOpacitySlider.addEventListener('input', function () {
+      appContainer.style.opacity = this.value;
+
+      // Also update opacity in electron's main process if needed
+      ipcRenderer.send('update-window-opacity', this.value);
+    });
+
+    // Horizontal resizing (column widths)
+    let isColumnResizing = false;
+    let startX, startWidth;
+
+    columnResizer.addEventListener('mousedown', function (e) {
+      isColumnResizing = true;
+      startX = e.clientX;
+      startWidth = parseInt(getComputedStyle(leftColumn).width, 10);
+      document.documentElement.style.cursor = 'ew-resize';
+    });
+
+    // Vertical resizing (between command and chat)
+    let isCommandResizing = false;
+    let startY, startHeight;
+
+    commandResizer.addEventListener('mousedown', function (e) {
+      isCommandResizing = true;
+      startY = e.clientY;
+      startHeight = parseInt(getComputedStyle(commandSidebar).height, 10);
+      document.documentElement.style.cursor = 'ns-resize';
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (isColumnResizing) {
+        const width = startWidth + e.clientX - startX;
+        // Limit min and max width
+        if (width > 150 && width < window.innerWidth - 200) {
+          leftColumn.style.width = width + 'px';
+          taskContainer.style.width = (window.innerWidth - width) + 'px';
+        }
+      }
+
+      if (isCommandResizing) {
+        const height = startHeight + e.clientY - startY;
+        // Limit min and max height
+        if (height > 100 && height < window.innerHeight - 200) {
+          commandSidebar.style.height = height + 'px';
+        }
+      }
+    });
+
+    document.addEventListener('mouseup', function () {
+      isColumnResizing = false;
+      isCommandResizing = false;
+      document.documentElement.style.cursor = '';
+    });
 
     // Legacy functions (keeping for compatibility)
     const showOverlay = () => {
@@ -351,19 +478,8 @@
         instructionBanner.innerHTML = '';
       }
 
-      const commandSidebar = document.getElementById('command-sidebar');
-      commandSidebar.style.opacity = show ? '1' : '0';
+      commandSidebar.style.display = show ? 'flex' : 'none';
     };
-
-    // Chat visibility toggle
-    chatToggleBtn.addEventListener('click', () => {
-      toggleChatVisibility();
-    });
-
-    function toggleChatVisibility() {
-      chatContainer.classList.toggle('hidden');
-      chatToggleBtn.textContent = chatContainer.classList.contains('hidden') ? '▶' : '◀';
-    }
 
     function formatTimeStamp() {
       const now = new Date();
@@ -421,16 +537,17 @@
 
       'add-chat-message': (event, message) => {
         addChatMessage(message.role, message.content);
-
-        // Make sure chat is visible when a new message comes in
-        if (chatContainer.classList.contains('hidden')) {
-          chatContainer.classList.remove('hidden');
-          chatToggleBtn.textContent = '◀';
-        }
       },
 
       'toggle-chat-visibility': () => {
-        toggleChatVisibility();
+        // No longer needed with the new layout
+        // But keeping for compatibility
+      },
+
+      // Listen for opacity updates from main process
+      'update-opacity': (event, opacity) => {
+        unifiedOpacitySlider.value = opacity;
+        appContainer.style.opacity = opacity;
       }
     };
 
@@ -489,6 +606,15 @@
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         mediaRecorder.stop();
         updateBanner("Processing audio...");
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+      // Recalculate right container width if left column has a custom width
+      if (leftColumn.style.width) {
+        const leftWidth = parseInt(leftColumn.style.width, 10);
+        taskContainer.style.width = (window.innerWidth - leftWidth) + 'px';
       }
     });
 
