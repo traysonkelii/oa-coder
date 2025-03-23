@@ -103,6 +103,11 @@ async function processScreenshots() {
       "analysis-result",
       response.choices[0].message.content
     );
+
+    mainWindow.webContents.send("add-chat-message", {
+      role: "assistant",
+      content: response.choices[0].message.content,
+    });
   } catch (err) {
     console.error("Error in processScreenshots:", err);
     if (mainWindow.webContents) {
@@ -316,16 +321,10 @@ function createWindow() {
   });
 
   // Move window (Ctrl + Arrow / Cmd + Arrow)
-  globalShortcut.register("CommandOrControl+Shift+Up", () => moveWindow("up"));
-  globalShortcut.register("CommandOrControl+Shift+Down", () =>
-    moveWindow("down")
-  );
-  globalShortcut.register("CommandOrControl+Shift+Left", () =>
-    moveWindow("left")
-  );
-  globalShortcut.register("CommandOrControl+Shift+Right", () =>
-    moveWindow("right")
-  );
+  globalShortcut.register("CommandOrControl+Up", () => moveWindow("up"));
+  globalShortcut.register("CommandOrControl+Down", () => moveWindow("down"));
+  globalShortcut.register("CommandOrControl+Left", () => moveWindow("left"));
+  globalShortcut.register("CommandOrControl+Right", () => moveWindow("right"));
 
   // Bind Ctrl+Shift+F to Start/Stop Recording
   globalShortcut.register("CommandOrControl+Shift+F", () => {
