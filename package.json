@@ -15,7 +15,7 @@
     "tmp": "^0.2.3"
   },
   "devDependencies": {
-    "electron": "^28.1.0",
+    "electron": "^35.1.2",
     "electron-builder": "^25.1.8"
   },
   "build": {
@@ -30,6 +30,11 @@
       },
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist"
-    }
+    },
+    "files": [
+      "**/*",
+      "!**/*.map",
+      "node_modules/screenshot-desktop/**/*"
+    ]
   }
 }

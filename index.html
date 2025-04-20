@@ -9,6 +9,7 @@
       width: 100%;
       height: 100%;
       background: none;
+      cursor: default;
     }
 
     body {
@@ -20,6 +21,11 @@
       font-family: Arial, sans-serif;
       overflow: hidden;
       position: relative;
+      cursor: default;
+    }
+
+    * {
+      cursor: default !important;
     }
 
     /* Main layout container */
@@ -45,7 +51,7 @@
     /* Command sidebar - Top part of left column */
     #command-sidebar {
       flex: 0 0 auto;
-      background: rgba(0, 0, 0, 0.45);
+      background: rgba(40, 40, 40, 0.45);
       color: #fff;
       padding: 15px;
       box-sizing: border-box;
@@ -82,7 +88,7 @@
     }
 
     .shortcut-key {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(40, 40, 40, 0.45);
       padding: 3px 6px;
       border-radius: 4px;
       margin-right: 8px;
@@ -105,7 +111,7 @@
 
     #chat-header {
       padding: 10px 15px;
-      background: rgba(50, 50, 50, 0.5);
+      background: rgba(40, 40, 40, 0.45);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       justify-content: space-between;
@@ -133,11 +139,11 @@
     }
 
     #chat-messages::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(40, 40, 40, 0.45);
     }
 
     #chat-messages::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(40, 40, 40, 0.45);
       border-radius: 3px;
     }
 
@@ -184,14 +190,13 @@
     #response-box {
       width: 100%;
       max-height: 100%;
-      background: rgba(25, 25, 25, 0.55);
+      background: rgba(40, 40, 40, 0.45);
       color: #fff;
       padding: 25px;
       box-sizing: border-box;
       font-size: 15px;
       line-height: 1.5;
       border-radius: 8px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
       overflow-y: auto;
     }
 
@@ -200,7 +205,7 @@
     }
 
     #response-box::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(40, 40, 40, 0.45);
       border-radius: 4px;
     }
 
@@ -213,13 +218,13 @@
     #command-resizer {
       height: 5px;
       width: 100%;
-      background: rgba(100, 100, 100, 0.4);
+      background: rgba(40, 40, 40, 0.45);
       cursor: ns-resize;
       position: relative;
     }
 
     #command-resizer:hover {
-      background: rgba(100, 100, 100, 0.7);
+      background: rgba(40, 40, 40, 0.45);
     }
 
     /* Unified opacity slider container */
@@ -229,7 +234,7 @@
       position: fixed;
       top: 15px;
       right: 15px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(40, 40, 40, 0.45);
       padding: 5px 10px;
       border-radius: 4px;
       z-index: 1000;
@@ -243,7 +248,7 @@
 
     /* Code and pre styling */
     pre {
-      background: rgba(40, 40, 40, 0.66);
+      background: rgba(40, 40, 40, 0);
       color: #f0f0f0;
       padding: 15px;
       border-radius: 6px;
@@ -255,7 +260,7 @@
 
     code {
       font-family: 'Fira Code', Consolas, 'Courier New', monospace;
-      background: rgba(60, 60, 60, 0.95);
+      background: rgba(25, 25, 25, 0);
       color: #fff;
       padding: 2px 6px;
       border-radius: 4px;
@@ -271,7 +276,7 @@
 
     .error-message {
       color: #ff4444;
-      background: rgba(255, 68, 68, 0.1);
+      background: rgba(40, 40, 40, 0.45);
       padding: 15px;
       border-radius: 6px;
       border-left: 4px solid #ff4444;
@@ -285,7 +290,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(40, 40, 40, 0.45);
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.3s ease, visibility 0.3s;
@@ -302,7 +307,7 @@
     #column-resizer {
       width: 5px;
       height: 100%;
-      background: rgba(100, 100, 100, 0.4);
+      background: rgba(40, 40, 40, 0.45);
       cursor: ew-resize;
       position: absolute;
       right: 0;
@@ -311,7 +316,7 @@
     }
 
     #column-resizer:hover {
-      background: rgba(100, 100, 100, 0.7);
+      background: rgba(40, 40, 40, 0.45);
     }
   </style>
 </head>

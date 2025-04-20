@@ -10,8 +10,12 @@ const screenshot = require("screenshot-desktop");
 const fs = require("fs");
 const { OpenAI } = require("openai");
 const tmp = require("tmp");
-systemPreferences.askForMediaAccess("microphone");
-systemPreferences.askForMediaAccess("camera");
+
+// Ask for media access on all platforms except Windows
+if (process.platform !== 'win32') {
+  systemPreferences.askForMediaAccess("microphone");
+  systemPreferences.askForMediaAccess("camera");
+}
 
 let config;
 try {
@@ -79,11 +83,16 @@ async function captureScreenshot() {
 }
 
 async function processScreenshots() {
+
+  const text = isSystemDesign ? 
+  "Provide a system design that solves the following requirements, ensure that entities are defined, associated APIs, technical trade-offs, and a high level design diagram of the solution" :
+  "Can you solve the question for me starting with a high level approach up top, implementation code in javascript with comments for each line of code in the middle, and the time and space complexity for the solution at the bottom?"; 
+
   try {
     const messages = [
       {
         type: "text",
-        text: "Can you solve the question for me with comments for each line, a brief summary of the solution up top, the time and space complexity for the solution at the bottom, and give the final answer/code?",
+        text
       },
     ];
     for (const img of screenshots) {
@@ -119,6 +128,8 @@ async function processScreenshots() {
 function resetProcess() {
   screenshots = [];
   multiPageMode = false;
+  isRecording = false;
+  isSystemDesign = false;
   mainWindow.webContents.send("clear-result");
   updateInstructionBanner();
 }
@@ -129,8 +140,10 @@ function updateInstructionBanner() {
     "Ctrl+Shift+A: Multi-mode",
     "Ctrl+Shift+F: Record Audio",
     "Ctrl+Shift+C: Show Chat",
+    "Ctrl+Shift+D: System Design Audio",
     "Ctrl+B: Toggle Hide",
     "Ctrl+Arrow: Control view",
+    "Ctrl+Shift+Up/Down: Window Opacity",
     "Ctrl+Shift+Q: Close",
   ];
 
@@ -144,6 +157,10 @@ function toggleWindowVisibility() {
     mainWindow.hide();
   }
   windowHidden = !windowHidden;
+}
+
+function toggleSystemDesign() {
+  isSystemDesign = !isSystemDesign;
 }
 
 function moveWindow(direction) {
@@ -169,6 +186,7 @@ function moveWindow(direction) {
 
 // Audio recording state
 let isRecording = false;
+let isSystemDesign = false;
 
 // Start the audio recording process
 function startRecording() {
@@ -274,6 +292,11 @@ function createWindow() {
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   mainWindow.setAlwaysOnTop(true, "screen-saver", 1);
 
+  // Show instructions immediately after window is loaded
+  mainWindow.webContents.on('did-finish-load', () => {
+    updateInstructionBanner();
+  });
+
   // Screenshot functionality
   globalShortcut.register("CommandOrControl+Shift+S", async () => {
     try {
@@ -320,11 +343,34 @@ function createWindow() {
     toggleWindowVisibility();
   });
 
+  globalShortcut.register("CommandOrControl+Shift+D", () => {
+    toggleSystemDesign();
+  });
+
   // Move window (Ctrl + Arrow / Cmd + Arrow)
   globalShortcut.register("CommandOrControl+Up", () => moveWindow("up"));
   globalShortcut.register("CommandOrControl+Down", () => moveWindow("down"));
   globalShortcut.register("CommandOrControl+Left", () => moveWindow("left"));
   globalShortcut.register("CommandOrControl+Right", () => moveWindow("right"));
+
+  // Opacity control shortcuts
+  globalShortcut.register("CommandOrControl+Shift+Up", () => {
+    if (mainWindow) {
+      const currentOpacity = mainWindow.getOpacity();
+      const newOpacity = Math.min(1, currentOpacity + 0.1);
+      mainWindow.setOpacity(newOpacity);
+      mainWindow.webContents.send('update-opacity', newOpacity);
+    }
+  });
+
+  globalShortcut.register("CommandOrControl+Shift+Down", () => {
+    if (mainWindow) {
+      const currentOpacity = mainWindow.getOpacity();
+      const newOpacity = Math.max(0.1, currentOpacity - 0.1);
+      mainWindow.setOpacity(newOpacity);
+      mainWindow.webContents.send('update-opacity', newOpacity);
+    }
+  });
 
   // Bind Ctrl+Shift+F to Start/Stop Recording
   globalShortcut.register("CommandOrControl+Shift+F", () => {
@@ -336,7 +382,7 @@ function createWindow() {
   });
 
   // Toggle chat visibility
-  globalShortcut.register("CommandOrControl+Shift+C", () => {
+  globalShortcut.register("CommandOrControl+Shift+C", () => { 
     mainWindow.webContents.send("toggle-chat-visibility");
   });
 
